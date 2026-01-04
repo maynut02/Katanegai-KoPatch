@@ -1,0 +1,248 @@
+
+script Sys/initial.txt Dev
+
+bookmark Display
+    screenSpaceStart Gallery freeOnReturnToMain
+    preLoad /Images/Gallery/BG0.webp | preLoad /Images/Gallery/BG1.webp | preLoad /Images/Gallery/BG2.webp
+    autoOnCamera true
+    if ( tgvGPCur == undefined ) temp_globalvar tgvGPCur = 0 | temp_globalvar tgvGPCur0 = 0 | temp_globalvar tgvGPCur1 = 0 | temp_globalvar tgvGPCur2 = 0
+    temp_globalvar tgvRem = false | temp_globalvar tgvBGMVolume = vn_sysBgmVolume
+    if ( tgvMusic == undefined ) temp_globalvar tgvMusic = 0
+    bg0 UI_sys_Gd_BG Gallery/BG{{tgvGPCur}}.webp on_camera
+    
+    if ( gvLang == "jpn" ) var _Str = "회상" else var _Str = "Memory"
+    cg0 UI_sys_Gd_Circle0 Circle_Inner.webp ( 1800 - ( 0.5 * lvTextureW("Circle_Inner.webp") ) ) ( 1100 - ( 0.5 * lvTextureH("Circle_Inner.webp") ) ) 321 | cg0 UI_sys_Gd_Circle1 Circle_Outer.webp ( 1800 - ( 0.5 * lvTextureW("Circle_Outer.webp") ) ) ( 1100 - ( 0.5 * lvTextureH("Circle_Outer.webp") ) ) 322 | loop 1 rotate UI_sys_Gd_Circle0 -360 30000 | loop 1 rotate UI_sys_Gd_Circle1 360 24000 | loop 2 move2 UI_sys_Gd_Circle0 10 10 4000 a4 | loop 2 move2 UI_sys_Gd_Circle1 10 10 3600 a4
+    text UI_sys_Gd_TStr 140 65 1 (gvFont["Name_{{gvLang}}"]) 50 middle (_Str) | textExtraSpacing UI_sys_Gd_TStr 20 0 | textShadow UI_sys_Gd_TStr 0 | textColour UI_sys_Gd_TStr #ffffff | parentChild UI_sys_Gd_BG UI_sys_Gd_TStr
+    
+    empty0 UI_sys_G_Base0 0 0 50 | empty0 UI_sys_G_Base1 0 0 50 | empty0 UI_sys_G_Base2 0 0 50 | empty0 UI_sys_G_Base3 0 0 50
+    script current UI_sys_G_Def
+    allowRender true
+    .fadein UI_sys_Gd_BG 300 sameLevelScreenSpaces
+    allowRender false
+    
+    script current SetSlots0
+    script current SetSlots1
+    script current SetSlots2
+    script current SetSlots3
+    script current SetGPB0
+    script current SetGPB1
+    script current SetGPB2
+    
+    script Sys/Gallery-{{tgvGPCur}}.txt IntSetter
+    
+    fadein UI_sys_Gd_(?!Btn_(TBack|Back|DefReset)_).* 300 sameLevelScreenSpaces
+    allowRender true | autoOnCamera false
+    keyDown r.click jump Exit_KT
+    keyDown esc jump Exit_KT
+    inputLock false
+wait preventContinueRead
+
+bookmark SetSlots0
+{
+    var _loop = 0 | var _col = 3 | var _cor_x = 320 | var _cor_y = 250 | var _space_x = 520 | var _space_y = 350
+    
+    autoOnCamera true
+
+    touchableRes Gallery/Slot_Off.webp Gallery/Slot_On.webp Gallery/Slot_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    textureCreateRect txSlotTN 464 261 #00000000
+    
+    bookmark SetSlots0_loop
+        button0 UI_sys_G_Slot0_{{_loop}} ( _loop % _col * _space_x + _cor_x ) ( _loop / _col * _space_y + _cor_y ) 305 script Sys/Gallery-0.txt Display (_loop)
+        cg0 UI_sys_G_SlotSS0_{{_loop}} txSlotTN 28 27 10 on_camera | parentChild UI_sys_G_Slot0_{{_loop}} UI_sys_G_SlotSS0_{{_loop}} | fadein UI_sys_G_SlotSS0_{{_loop}}
+    if ( _loop < 5 ) var _loop += 1 | jump SetSlots0_loop
+    parentChild UI_sys_G_Base0 UI_sys_G_Slot0_\d+ | fadein UI_sys_G_Slot0_\d+
+    autoOnCamera false
+}
+script_fin
+
+bookmark SetSlots1
+{
+    var _loop = 0 | var _col = 3 | var _cor_x = 320 | var _cor_y = 250 | var _space_x = 520 | var _space_y = 350
+    
+    autoOnCamera true
+
+    touchableRes Gallery/Slot_Off.webp Gallery/Slot_On.webp Gallery/Slot_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    textureCreateRect txSlotTN 464 261 #00000000
+    
+    bookmark SetSlots1_loop
+        button0 UI_sys_G_Slot1_{{_loop}} ( _loop % _col * _space_x + _cor_x ) ( _loop / _col * _space_y + _cor_y ) 305 script Sys/Gallery-1.txt RemStart (_loop)
+        cg0 UI_sys_G_SlotSS1_{{_loop}} txSlotTN 28 27 10 on_camera | parentChild UI_sys_G_Slot1_{{_loop}} UI_sys_G_SlotSS1_{{_loop}} | fadein UI_sys_G_SlotSS1_{{_loop}}
+    if ( _loop < 5 ) var _loop += 1 | jump SetSlots1_loop
+    parentChild UI_sys_G_Base1 UI_sys_G_Slot1_\d+ | fadein UI_sys_G_Slot1_\d+
+    autoOnCamera false
+}
+script_fin
+
+bookmark ResetSlots2
+{
+    var _reset = true
+}
+bookmark SetSlots2
+{
+    var _loop = 0 | var _col = 2 | var _cor_x = 350 | var _cor_y = 300 | var _space_x = 750 | var _space_y = 150
+    if ( _reset != undefined ) allowRender false
+    autoOnCamera true
+    fadeout UI_sys_G_Slot2_\d+
+    bookmark SetSlots2_loop
+        var _num = tgvGPCur2 * 6 + _loop
+        if ( !gvBGM["{{_num}}"]["bool"] ) jump SetSlots2_skip
+        touchableRes Gallery/Btn_M{{_num}}_Off.webp Gallery/Btn_M{{_num}}_On.webp Gallery/Btn_M{{_num}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+        button0 UI_sys_G_Slot2_{{_loop}} ( _loop % _col * _space_x + _cor_x ) ( _loop / _col * _space_y + _cor_y ) 305 script Sys/Gallery-2.txt MusicInsert {{_num}}
+        text UI_sys_G_Slot2_{{_loop}}_Title 20 35 1 (gvFont[gvLang]) 32 ( gvBGM["{{_num}}"]["name"][gvLang] ) | parentChild UI_sys_G_Slot2_{{_loop}} UI_sys_G_Slot2_{{_loop}}_Title
+        var _legit = "tgvMusic == {{_num}}" | highlight_if UI_sys_G_Slot2_{{_loop}} (_legit)
+    bookmark SetSlots2_skip
+    if ( ( _num + 1 < 18 ) && ( _loop + 1 < 6 ) ) var _loop += 1 | jump SetSlots2_loop
+    if ( lvSize( lvGetNames("UI_sys_G_Slot2_\d+") ) < 1 ) jump SetSlots2_nothing
+    parentChild UI_sys_G_Base2 UI_sys_G_Slot2_\d+ | fadein UI_sys_G_Slot2_\d+
+    textShadow UI_sys_G_Slot2_\d+_Title 0 | textColour UI_sys_G_Slot2_\d+_Title #303030
+bookmark SetSlots2_nothing
+    autoOnCamera false
+    if ( _reset != undefined ) allowRender true
+}
+script_fin
+
+bookmark SetSlots3
+{
+    var _loop = 0 | var _col = 3 | var _cor_x = 320 | var _cor_y = 250 | var _space_x = 520 | var _space_y = 350
+    
+    autoOnCamera true
+
+    touchableRes Gallery/Slot_Off.webp Gallery/Slot_On.webp Gallery/Slot_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    textureCreateRect txSlotTN 464 261 #00000000
+    var _src = lvCreateVarList(3, "") | var _src[0] = "OP" | var _src[1] = "Yukyu" | var _src[2] = "Rinne"
+    var _bool = lvCreateVarList(3) | var _bool[0] = true | var _bool[1] = gvCompleteYukyu | var _bool[2] = gvCompleteRinne
+    bookmark SetSlots3_loop
+        if ( _bool[_loop] ) button0 UI_sys_G_Slot3_{{_loop}} ( _loop % _col * _space_x + _cor_x ) ( _loop / _col * _space_y + _cor_y ) 305 script Sys/Gallery-3.txt Play (_src[_loop]) (_bool[_loop]) | text0 UI_sys_G_SlotNum3_{{_loop}} 55 -10 1 (gvFont["eng"]) 26 right on_camera "{{ _loop + 1 }}" | cg0 UI_sys_G_SlotSS3_{{_loop}} Gallery/TN/Movie{{_loop + 1}}.webp 28 27 10 on_camera | parentChild UI_sys_G_Slot3_{{_loop}} UI_sys_G_Slot(SS|Num)3_{{_loop}} | fadein UI_sys_G_Slot(SS|Num)3_{{_loop}}
+    if ( _loop + 1 < 3 ) var _loop += 1 | jump SetSlots3_loop
+    textShadow UI_sys_G_SlotNum3_\d+ 0 | parentChild UI_sys_G_Base3 UI_sys_G_Slot3_\d+ | fadein UI_sys_G_Slot3_\d+
+    autoOnCamera false
+}
+script_fin
+
+bookmark UI_sys_G_Def
+{
+    autoOnCamera true
+    
+    touchableRes Gallery/PageBtn_0_Off_{{gvLang}}.webp Gallery/PageBtn_0_On_{{gvLang}}.webp Gallery/PageBtn_0_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_Gd_Btn_0 0 250 351 script Sys/Gallery-0.txt Setter
+    highlight_if UI_sys_Gd_Btn_0 "tgvGPCur == 0"
+    touchableRes Gallery/PageBtn_1_Off_{{gvLang}}.webp Gallery/PageBtn_1_On_{{gvLang}}.webp Gallery/PageBtn_1_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_Gd_Btn_1 0 450 351 script Sys/Gallery-1.txt Setter
+    highlight_if UI_sys_Gd_Btn_1 "tgvGPCur == 1"
+    touchableRes Gallery/PageBtn_2_Off_{{gvLang}}.webp Gallery/PageBtn_2_On_{{gvLang}}.webp Gallery/PageBtn_2_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_Gd_Btn_2 0 650 351 script Sys/Gallery-2.txt Setter
+    highlight_if UI_sys_Gd_Btn_2 "tgvGPCur == 2"
+    touchableRes Gallery/PageBtn_3_Off_{{gvLang}}.webp Gallery/PageBtn_3_On_{{gvLang}}.webp Gallery/PageBtn_3_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_Gd_Btn_3 0 850 351 script Sys/Gallery-3.txt Setter
+    highlight_if UI_sys_Gd_Btn_3 "tgvGPCur == 3"
+    
+    touchableRes UI/Btn_Off.webp UI/Btn_On.webp UI/Btn_On.webp ( gvSFX["exit"]["touch"] ) ( gvSFX["exit"]["click"] )
+    button0 UI_sys_Gd_Btn_TBack 1570 980 350 jump Exit | cg0 UI_sys_Gd_Btn_TBack_Str UI/BtnText_TBack_Off_{{gvLang}}.webp ( 0.5 * ( 360 - lvTextureW("UI/BtnText_TBack_Off_{{gvLang}}.webp") ) ) ( 62 - lvTextureH("UI/BtnText_TBack_Off_{{gvLang}}.webp") ) 1 | parentChild UI_sys_Gd_Btn_TBack UI_sys_Gd_Btn_TBack_Str | fadein UI_sys_Gd_Btn_TBack_Str
+    cg0 UI_sys_Gd_Btn_TBack_Leave UI/Square_Off.webp 18 30 1 | cg0 UI_sys_Gd_Btn_TBack_Touch UI/Square_On.webp 5 16 2 | parentChild UI_sys_Gd_Btn_TBack UI_sys_Gd_Btn_TBack_Touch, UI_sys_Gd_Btn_TBack_Leave | fadein UI_sys_Gd_Btn_TBack_Leave
+    onTouchStart UI_sys_Gd_Btn_TBack script current UITouch "TBack" | onTouchExit UI_sys_Gd_Btn_TBack script current UILeave "TBack"
+    
+    autoOnCamera false
+}
+script_fin
+
+//464 261 28 27
+bookmark UITouch _num
+{
+    if ( tgvSLDiv == _num ) script_fin
+}
+bookmark UITouch_force _num
+{
+    alpha UI_sys_Gd_Btn_{{_num}}_Touch 255 | alpha UI_sys_Gd_Btn_{{_num}}_Leave 0 | zoom UI_sys_Gd_Btn_{{_num}}_Touch 150% 200 a6
+    image UI_sys_Gd_Btn_{{_num}}_Str UI/BtnText_{{_num}}_On_{{gvLang}}.webp
+}
+script_fin
+
+bookmark UILeave _num
+{
+    if ( tgvSLDiv == _num ) script_fin
+    alpha UI_sys_Gd_Btn_{{_num}}_Leave 255 | alpha UI_sys_Gd_Btn_{{_num}}_Touch 0 | zoom UI_sys_Gd_Btn_{{_num}}_Touch 100%
+    image UI_sys_Gd_Btn_{{_num}}_Str UI/BtnText_{{_num}}_Off_{{gvLang}}.webp
+}
+script_fin
+
+bookmark SetGPB0
+{
+    autoOnCamera true
+    var _loop = 0 | var _end = 4
+    bookmark SetGPB0_loop
+        touchableRes UI/Num_{{_loop+1}}_Off.webp UI/Num_{{_loop+1}}_On.webp UI/Num_{{_loop+1}}_On.webp (gvSFX["btn"]["touch"]) (gvSFX["btn"]["click"]) UI/Num_{{_loop+1}}_On.webp
+        button0 UI_sys_G_0_Page_{{_loop}} ( _loop * 80 + 1520 ) 55 315 script Sys/Gallery-0.txt go_to_Page {{_loop}}
+        var _f = "tgvGPCur0 == {{_loop}}" | highlight_if UI_sys_G_0_Page_{{_loop}} (_f)
+    if ( _loop + 1 < _end ) var _loop += 1 | jump SetGPB0_loop
+    parentChild UI_sys_G_Base0 UI_sys_G_0_Page_\d+ | fadein UI_sys_G_0_Page_\d+
+    autoOnCamera false
+}
+script_fin
+
+bookmark SetGPB1
+{
+    autoOnCamera true
+    var _loop = 0 | var _end = 2
+    bookmark SetGPB1_loop
+        touchableRes UI/Num_{{_loop+1}}_Off.webp UI/Num_{{_loop+1}}_On.webp UI/Num_{{_loop+1}}_On.webp (gvSFX["btn"]["touch"]) (gvSFX["btn"]["click"]) UI/Num_{{_loop+1}}_On.webp
+        button0 UI_sys_G_1_Page_{{_loop}} ( _loop * 80 + 1680 ) 55 315 script Sys/Gallery-1.txt go_to_Page {{_loop}}
+        var _f = "tgvGPCur1 == {{_loop}}" | highlight_if UI_sys_G_1_Page_{{_loop}} (_f)
+    if ( _loop + 1 < _end ) var _loop += 1 | jump SetGPB1_loop
+    parentChild UI_sys_G_Base1 UI_sys_G_1_Page_\d+ | fadein UI_sys_G_1_Page_\d+
+    autoOnCamera false
+}
+script_fin
+
+bookmark SetGPB2
+{
+    autoOnCamera true
+    var _loop = 0 | var _end = 3
+    bookmark SetGPB2_loop
+        touchableRes UI/Num_{{_loop+1}}_Off.webp UI/Num_{{_loop+1}}_On.webp UI/Num_{{_loop+1}}_On.webp (gvSFX["btn"]["touch"]) (gvSFX["btn"]["click"]) UI/Num_{{_loop+1}}_On.webp
+        button0 UI_sys_G_2_Page_{{_loop}} ( _loop * 80 + 1600 ) 55 315 script Sys/Gallery-2.txt go_to_Page {{_loop}}
+        var _f = "tgvGPCur2 == {{_loop}}" | highlight_if UI_sys_G_2_Page_{{_loop}} (_f)
+    if ( _loop + 1 < _end ) var _loop += 1 | jump SetGPB2_loop
+    parentChild UI_sys_G_Base2 UI_sys_G_2_Page_\d+ | fadein UI_sys_G_2_Page_\d+
+    temp_globalvar tgvMusicStatus = "Mute" | temp_globalvar tgvMusicRepeat = true
+    var _pre = "UI_sys_G_2" | var _var = "Prev" | var _X = 705 | var _Y = 790
+    touchableRes Gallery/Btn_{{_var}}_Off.webp Gallery/Btn_{{_var}}_On.webp Gallery/Btn_{{_var}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn_{{_var}} (_X) (_Y) 351 script Sys/Gallery-2.txt MusicPrev
+    var _var = "Pause" | var _X += 150
+    touchableRes Gallery/Btn_{{_var}}_Off.webp Gallery/Btn_{{_var}}_On.webp Gallery/Btn_{{_var}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn_{{_var}} (_X) (_Y) 351 script Sys/Gallery-2.txt MusicPause | highlight_if {{_pre}}_Btn_{{_var}} "tgvMusicStatus == \"Pause\""
+    var _var = "Play" | var _X += 150
+    touchableRes Gallery/Btn_{{_var}}_Off.webp Gallery/Btn_{{_var}}_On.webp Gallery/Btn_{{_var}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn_{{_var}} (_X) (_Y) 351 script Sys/Gallery-2.txt MusicPlay | highlight_if {{_pre}}_Btn_{{_var}} "tgvMusicStatus == \"Play\""
+    var _var = "Next" | var _X += 150
+    touchableRes Gallery/Btn_{{_var}}_Off.webp Gallery/Btn_{{_var}}_On.webp Gallery/Btn_{{_var}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn_{{_var}} (_X) (_Y) 351 script Sys/Gallery-2.txt MusicNext
+    var _var = "Repeat" | var _X += 150
+    touchableRes Gallery/Btn_{{_var}}_Off.webp Gallery/Btn_{{_var}}_On.webp Gallery/Btn_{{_var}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn_{{_var}} (_X) (_Y) 351 script Sys/Gallery-2.txt MusicRepeat | highlight_if {{_pre}}_Btn_{{_var}} "tgvMusicRepeat"
+    parentChild UI_sys_G_Base2 UI_sys_G_2_Btn_\w+ | fadein UI_sys_G_2_Btn_\w+
+    var _X = 750 | var _Y = 870
+    cg0 {{_pre}}_M_TbarBG UI/SliderBG.webp (_X + 80) (_Y - 10) 355
+    touchableRes UI/que.webp UI/que.webp UI/que.webp | trackbar0 {{_pre}}_M_TBar ( _X + 92 ) ( _Y + 2 ) 357 horizontal 450 vn_sysBgmVolume 0 100
+    text0 {{_pre}}_M_Str_L ( _X + 60 ) ( _Y - 8 ) 351 (gvFont["eng"]) 28 right "min" | text0 {{_pre}}_M_Str_R ( _X + 575 ) ( _Y - 8 ) 351 (gvFont["eng"]) 28 "max"
+    textShadow {{_pre}}_M_.* 0 | textBold {{_pre}}_M_.* false
+    parentChild UI_sys_G_Base2 UI_sys_G_2_M_.* | fadein UI_sys_G_2_M_.*
+    autoOnCamera false
+}
+script_fin
+
+bookmark Exit_KT
+{
+    soundEffect vn_clickedSound ( gvSFX["exit"]["click"] )
+}
+bookmark Exit
+{
+    inputLock true | keyTriggerReset
+    .fadeout all 300
+    .fadeout UI_sys_G.* 300 sameLevelScreenSpaces
+    inputLock false | releaseUnusedMemory
+    screenSpaceFin Gallery
+    if ( tgvBGMVolume != undefined ) systemvar vn_sysBgmVolume = tgvBGMVolume | saveSystemVars
+    script Sys/initial.txt Restart
+    eraseVars2 tgv.*
+}
+finaljump Sys/title.txt TBFromGallery

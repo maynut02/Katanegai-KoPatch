@@ -1,0 +1,168 @@
+
+script Sys/initial.txt Dev
+bg UI_sys_cd_bg Config/BG.webp 0 0 320 on_camera | script Sys/config.txt UI_sys_cd_def | fadein UI_sys_cd_.*
+
+bookmark Setter_KT
+{
+    if ( gvConfigPage == 1 ) script_fin
+    soundEffect vn_clickedSound (gvSFX["btn"]["click"])
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-12.flac
+}
+jump IntSetter
+bookmark Setter
+{
+    if ( gvConfigPage == 1 ) script_fin
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-12.flac
+}
+bookmark IntSetter
+{
+    globalvar gvConfigPage = 1
+    
+    inputLock true | autoOnCamera true | allowRender false
+    
+    .fadeout UI_sys_C_.*
+    var _d = 200
+}
+jump SkipLang
+//if ( tgvCFrom != 0 ) jump SkipLang
+{
+    script Sys/config.txt Cont0 "Lang" 450 (_d) "언어"
+    script Sys/config.txt Cont2 "jpn" 925 (_d) "일본어" "globalvar gvLang = \"jpn\"" "gvLang == \"jpn\""
+    //script Sys/config.txt Cont2 "eng" 1159 (_d) "英語" "globalvar gvLang = \"eng\"" "gvLang == \"eng\""
+    //script Sys/config.txt Cont2 "zhcn" 1607 (_d) "簡体字" "globalvar gvLang = \"zhcn\"" "gvLang == \"zhcn\""
+    //script Sys/config.txt Cont2 "zhtw" 1413 (_d) "繁体字" "globalvar gvLang = \"zntw\"" "gvLang == \"zntw\""
+
+    var _d += 90
+}
+bookmark SkipLang
+{
+    script Sys/config.txt Cont0 "SkipReadText" 450 (_d) "읽은 문장 건너뛰기"
+    script Sys/config.txt Cont1 "SkipAll" 980 (_d) (gvStr["On"][gvLang]) "textSkipMode 0" "vn_sysTextSkipMethod == 0"
+    script Sys/config.txt Cont1 "SkipOnlyUnread" 1320 (_d) (gvStr["Off"][gvLang]) "textSkipMode 1" "vn_sysTextSkipMethod == 1"
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "TS" 450 (_d) "일반 텍스트 속도"
+    script Sys/config.txt TBar "TS" 805 (_d) "vn_sysTextSpeed" 100 0 "min" "max" "textRedisplay UI_sys_C_box(ECG)?_n"
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "AS" 450 (_d) "자동 텍스트 속도"
+    script Sys/config.txt TBar "AS" 805 (_d) "vn_sysAutoSpeed" 100 0
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "AW" 450 (_d) "자동 대기 시간"
+    script Sys/config.txt TBar "AW" 805 (_d) "vn_sysAutoWait" 0 5000
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "TBA" 450 (_d) "창 투명도"
+    script Sys/config.txt TBar "TBA" 805 (_d) "gvTBoxAlpha" 0 255
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "TBAECG" 450 (_d) "(CG)"
+    script Sys/config.txt TBar "TBAECG" 805 (_d) "gvTBoxAlphaECG" 0 255
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "ReadTextColor" 450 (_d) "읽은 텍스트 표시"
+    script Sys/config.txt Cont1 "ReadTextColorOn" 980 (_d) (gvStr["On"][gvLang]) "script Sys/config-1.txt ReadTextColor true" "gvReadColor"
+    script Sys/config.txt Cont1 "ReadTextColorOff" 1320 (_d) (gvStr["Off"][gvLang]) "script Sys/config-1.txt ReadTextColor false" "!gvReadColor"
+
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "SelColor" 450 (_d) "확인한 선택지 표시"
+    script Sys/config.txt Cont1 "SelColorOn" 980 (_d) (gvStr["On"][gvLang]) "script Sys/config-1.txt SelColor true" "gvSelColor"
+    script Sys/config.txt Cont1 "SelColorOff" 1320 (_d) (gvStr["Off"][gvLang]) "script Sys/config-1.txt SelColor false" "!gvSelColor"
+    
+    var _d -= 310
+    
+    empty0 UI_sys_C_TextSampleBG 1450 (_d) 340 on_camera | cg0 UI_sys_TextSample Config/TboxSample.webp 0 0 0 | parentChild UI_sys_C_TextSampleBG UI_sys_TextSample | alpha UI_sys_TextSample (gvTBoxAlpha)
+    varChecker UI_sys_C_vC_TBoxAlpha "gvTBoxAlpha" "script Sys/config-1.txt TBA {}"
+    empty0 UI_sys_C_TextSampleBG4ECG 1450 ( _d + 90 ) 340 on_camera | cg0 UI_sys_TextSample4ECG Config/TboxSample.webp 0 0 0 | parentChild UI_sys_C_TextSampleBG4ECG UI_sys_TextSample4ECG | alpha UI_sys_TextSample4ECG (gvTBoxAlphaECG)
+    varChecker UI_sys_C_vC_TBoxAlphaECG "gvTBoxAlphaECG" "script Sys/config-1.txt TBAECG {}"
+    var t_sys = lvCreateVarHashMap() | var t_sys["jpn"] = lvCreateVarHashMap()
+    var t_sys["jpn"]["ex0"] = "일반 텍스트"
+    var t_sys["jpn"]["ex1"] = "자동 진행 시 텍스트 속도"
+    
+    temp_globalvar tgvS_n = lvCreateVarHashMap()
+    temp_globalvar tgvS_a = lvCreateVarHashMap()
+    temp_globalvar tgvS_n["jpn"] = 18
+    temp_globalvar tgvS_a["jpn"] = 19
+    
+    text0 UI_sys_C_box_n 1470 ( _d + 10 ) 345 (gvFont[gvLang]) 28 on_camera (t_sys[gvLang]["ex0"])
+    textSpeed UI_sys_C_box_n followSystem
+    text0 UI_sys_C_boxECG_n 1470 ( _d + 100 ) 345 (gvFont[gvLang]) 28 on_camera (t_sys[gvLang]["ex0"])
+    textSpeed UI_sys_C_boxECG_n followSystem
+    //timer UI_sys_C_timer_n ((vn_sysTextSpeed*tgvS_n[gvLang]*6/5)+1000) repeat textRedisplay UI_sys_C_box_n
+    
+    text0 UI_sys_C_box_a 1470 ( _d + 50 ) 345 (gvFont[gvLang]) 28 on_camera (t_sys[gvLang]["ex1"])
+    textSpeed UI_sys_C_box_a followSystemAuto
+    text0 UI_sys_C_boxECG_a 1470 ( _d + 140 ) 345 (gvFont[gvLang]) 28 on_camera (t_sys[gvLang]["ex1"])
+    textSpeed UI_sys_C_boxECG_a followSystemAuto
+    //timer UI_sys_C_timer_a ((vn_sysAutoSpeed*tgvS_a[gvLang]*6/5)+(vn_sysAutoWait)) repeat textRedisplay UI_sys_C_box_a
+    //varChecker UI_sys_C_vcns2 "vn_sysTextSpeed" "script Sys/config-1.txt sample_normal"
+    //varChecker UI_sys_C_vcas2 "vn_sysAutoSpeed" "script Sys/config-1.txt sample_auto"
+    //varChecker UI_sys_C_vcaw2 "vn_sysAutoWait" "script Sys/config-1.txt sample_auto"
+    
+    textShadow UI_sys_C_.* 0 | textBold UI_sys_C_.* false | textShadow UI_sys_C_box(ECG)?_[an] 1 3 #33333360 0 2
+    script Sys/config.txt design
+    textRepeat UI_sys_C_box(ECG)?_a true
+    inputLock false
+}
+script_fin
+
+bookmark TBA _value
+{
+    globalvar gvTBoxAlpha = _value | saveGlobalVars
+    alpha UI_sys_TextSample (_value)
+    if ( !tgvECGExists ) alpha UI_TBox_skin (_value) allScreenSpaces
+}
+script_fin
+bookmark TBAECG _value
+{
+    globalvar gvTBoxAlphaECG = _value | saveGlobalVars
+    alpha UI_sys_TextSample4ECG (_value)
+    if ( tgvECGExists ) alpha UI_TBox_skin (_value) allScreenSpaces
+}
+script_fin
+
+bookmark ReadTextColor _bool
+{
+    if (_bool) textColourSkippable #fcef95 | globalvar gvReadColor = true
+    else textColourSkippable #ffffff | globalvar gvReadColor = false
+    saveGlobalVars
+}
+script_fin
+
+bookmark SelColor _bool
+{
+    globalvar gvSelColor = _bool | saveGlobalVars
+}
+script_fin
+
+bookmark sample_normal
+{
+    inputLock true
+    
+    fadeout UI_sys_C_timer_n
+    
+    timer UI_sys_C_timer_n ((vn_sysTextSpeed*tgvS_n[gvLang]*11/10)+1000) repeat textRedisplay UI_sys_C_box_n
+    
+    inputLock false
+}
+script_fin
+
+bookmark sample_auto
+{
+    inputLock true
+    
+    fadeout UI_sys_C_timer_a
+    
+    timer UI_sys_C_timer_a ((vn_sysTextSpeed*tgvS_a[gvLang]*11/10)+vn_sysAutoWait) repeat textRedisplay UI_sys_C_box_a
+    
+    inputLock false
+}
+script_fin

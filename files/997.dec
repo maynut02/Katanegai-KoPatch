@@ -1,0 +1,304 @@
+
+script Sys/initial.txt Dev
+
+bookmark DisplayFromTitle
+{
+    inputLock true
+    
+    temp_globalvar tgvCFrom = 0
+    
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-4.flac noBacklogAddition
+}
+jump sigma
+
+bookmark Display_FromMenu
+{
+    if (gvPopLock) script_fin
+    inputLock true
+    
+    temp_globalvar tgvCFrom = 2
+    
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-10.flac noBacklogAddition
+}
+jump sigma
+
+bookmark Display_KT
+{
+    if (gvPopLock) script_fin
+    textReadNormal | script Sys/global.txt Pause | soundEffect vn_clickedSound ( gvSFX["btn"]["click"] )
+}
+bookmark Display
+{
+    if (gvPopLock) script_fin
+    
+    textReadNormal | inputLock true | script Sys/global.txt Pause
+    
+    temp_globalvar tgvCFrom = 1
+    
+    textReadSkip false
+    
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-10.flac noBacklogAddition
+}
+bookmark sigma
+{
+    if ( gvConfigPage == undefined ) globalvar gvConfigPage = 0
+    temp_globalvar tgvViewer = gvCSVColumn
+    temp_globalvar tgvCFadeTime = 300
+    temp_globalvar tgvECGExists = lvExistsObj("ECGStory")
+    screenSpaceStart config_pre freeOnReturnToMain
+    
+    inputLock true
+    
+    bg0 UI_sys_cd_BG Config/BG.webp 0 0 320 on_camera
+    //cg0 UI_sys_cd_Title Config/Title_Config_{{gvLang}}.webp 80 45 1 on_camera | parentChild UI_sys_cd_BG UI_sys_cd_Title | fadein UI_sys_cd_Title
+    if ( gvLang == "jpn" ) var _Str = "설정" else var _Str = "Config"
+    text0 UI_sys_cd_Title 140 65 1 (gvFont["Name_{{gvLang}}"]) 50 middle on_camera (_Str) | textExtraSpacing UI_sys_cd_Title 20 0 | textShadow UI_sys_cd_Title 0 | textColour UI_sys_cd_Title #ffffff | parentChild UI_sys_cd_BG UI_sys_cd_Title | fadein UI_sys_cd_Title
+    text0 UI_sys_cd_Ver 280 1040 1 (gvFont["Name_eng"]) 16 right on_camera ( "Ver. " + lvNumberToString(gvVer, 2) ) | textShadow UI_sys_cd_Ver 0 | textColour UI_sys_cd_Ver #909090 | parentChild UI_sys_cd_BG UI_sys_cd_Ver | fadein UI_sys_cd_Ver
+    .fadein UI_sys_cd_BG 300
+    screenSpaceOverwrite config_set
+    inputLock true | autoOnCamera true
+    
+    cg0 UI_sys_cd_Circle0 Circle_Inner.webp ( 1800 - ( 0.5 * lvTextureW("Circle_Inner.webp") ) ) ( 1100 - ( 0.5 * lvTextureH("Circle_Inner.webp") ) ) 321 | cg0 UI_sys_cd_Circle1 Circle_Outer.webp ( 1800 - ( 0.5 * lvTextureW("Circle_Outer.webp") ) ) ( 1100 - ( 0.5 * lvTextureH("Circle_Outer.webp") ) ) 322 | loop 1 rotate UI_sys_cd_Circle0 -360 30000 | loop 1 rotate UI_sys_cd_Circle1 360 24000 | loop 2 move2 UI_sys_cd_Circle0 10 10 4000 a4 | loop 2 move2 UI_sys_cd_Circle1 10 10 3600 a4
+    script Sys/config.txt UI_sys_cd_def
+    
+    textBold UI_sys_cd_\w+_text false | textShadow UI_sys_cd_\w+_text 0
+    
+    fadein UI_sys_cd_(?!Btn_(TBack|Back|DefReset)_).* 300
+    //script current UITouch_force (gvConfigPage)
+    
+    script Sys/config-{{gvConfigPage}}.txt IntSetter
+    
+    allowRender true
+    temp_globalvar tgvCFadeTime = 0
+    keyDown r.click jump Exit_KT
+    keyDown esc jump Exit_KT
+    keyDown wheel.up "script Sys/config-{{gvConfigPage + 2 % 3}}.txt Setter_KT"
+    keyDown wheel.down "script Sys/config-{{gvConfigPage + 4 % 3}}.txt Setter_KT"
+    inputLock false
+}
+wait preventContinueRead
+script_fin
+
+bookmark TBar _name _X _Y _var _l _r _lStr _rStr _cmnd
+{
+    autoOnCamera true
+    if ( _lStr == undefined ) var _lStr = "min" | var _rStr = "max" | var _cmnd = ""
+    elseif ( _cmnd == undefined ) var _cmnd = ""
+    var _pre = "UI_sys_C_{{_name}}"
+    cg0 {{_pre}}_TbarBG Config/SliderBG.webp (_X + 80) (_Y - 10) 355
+    touchableRes Config/que.webp Config/que.webp Config/que.webp | trackbar0 {{_pre}}_TBar ( _X + 92 ) ( _Y + 2 ) 357 horizontal 450 {{_var}} (_l) (_r) {{_cmnd}}
+    text0 {{_pre}}_Str_L ( _X + 60 ) ( _Y - 8 ) 351 (gvFont["eng"]) 28 right "{{_lStr}}" | text0 {{_pre}}_Str_R ( _X + 575 ) ( _Y - 8 ) 351 (gvFont["eng"]) 28 "{{_rStr}}" | textShadow {{_pre}}_Str_\w 0 | textBold {{_pre}}_Str_\w false
+    autoOnCamera false
+}
+script_fin
+
+bookmark Cont0 _name _X _Y _Str _size
+{
+    autoOnCamera true
+    var _pre = "UI_sys_C_{{_name}}"
+    if ( _size == undefined ) var _size = 36
+    text0 {{_pre}}_TagName (_X) ( _Y - ( 0.5 * _size ) ) 351 (gvFont[gvLang]) (_size) (_Str)
+    textShadow {{_pre}}_TagName 0 | textBold {{_pre}}_TagName false | textColour {{_pre}}_TagName #e0e0e0
+    autoOnCamera false
+}
+script_fin
+
+bookmark Cont1 _name _X _Y _Str _Cmnd _case
+{
+    autoOnCamera true | createOrigin 0.5 0.5 0.5
+    var _pre = "UI_sys_C_{{_name}}"
+    touchableRes Config/SetBtn_Off.webp Config/SetBtn_On.webp Config/SetBtn_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn (_X) (_Y) 351 {{_Cmnd}} | btnText {{_pre}}_Btn (gvFont[gvLang]) 32 (_Str) | highlight_if {{_pre}}_Btn (_case)
+    textShadow {{_pre}}_Btn_text 0 | textBold {{_pre}}_Btn_text false | textColour {{_pre}}_Btn_text #353535
+    autoOnCamera false | createOrigin default
+}
+script_fin
+
+bookmark Cont2 _name _X _Y _Str _Cmnd _case
+{
+    autoOnCamera true | createOrigin 0.5 0.5 0.5
+    var _pre = "UI_sys_C_{{_name}}"
+    touchableRes Config/SetBtnMini_Off.webp Config/SetBtnMini_On.webp Config/SetBtnMini_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn (_X) (_Y) 351 {{_Cmnd}} | btnText {{_pre}}_Btn (gvFont[gvLang]) 32 (_Str) | highlight_if {{_pre}}_Btn (_case)
+    textShadow {{_pre}}_Btn_text 0 | textBold {{_pre}}_Btn_text false | textColour {{_pre}}_Btn_text #353535
+    autoOnCamera false | createOrigin default
+}
+script_fin
+
+bookmark Cont3 _name _X _Y _Var
+{
+    autoOnCamera true | createOrigin 0.5 0.5 0.5
+    var _pre = "UI_sys_C_{{_name}}"
+    touchableRes Config/CBox_Off.webp Config/CBox_On.webp Config/CBox_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_CBoxOff (_X) (_Y) 351 script Sys/config.txt CBox_SV (_Var) false | highlight_if {{_pre}}_CBoxOff ("!"+_Var)
+    button0 {{_pre}}_CBoxOn ( _X + 80 ) (_Y) 351 script Sys/config.txt CBox_SV (_Var) true | highlight_if {{_pre}}_CBoxOn (_Var)
+    autoOnCamera false | createOrigin default
+}
+script_fin
+
+bookmark Cont4 _name _X _Y _Var
+{
+    autoOnCamera true | createOrigin 0.5 0.5 0.5
+    var _pre = "UI_sys_C_{{_name}}"
+    touchableRes Config/CBox_Off.webp Config/CBox_On.webp Config/CBox_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_CBoxOff (_X) (_Y) 351 script Sys/config.txt CBox_GV (_Var) false | highlight_if {{_pre}}_CBoxOff ("!"+_Var)
+    button0 {{_pre}}_CBoxOn ( _X + 80 ) (_Y) 351 script Sys/config.txt CBox_GV (_Var) true | highlight_if {{_pre}}_CBoxOn (_Var)
+    autoOnCamera false | createOrigin default
+}
+script_fin
+
+bookmark Cont5 _name _X _Y _Str _Cmnd _case
+{
+    autoOnCamera true | createOrigin 0.5 0.5 0.5
+    var _pre = "UI_sys_C_{{_name}}"
+    touchableRes Config/SysV_{{_name}}_Off.webp Config/SysV_{{_name}}_On.webp Config/SysV_{{_name}}_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 {{_pre}}_Btn (_X) (_Y) 351 {{_Cmnd}} | btnText {{_pre}}_Btn (gvFont[gvLang]) 32 -90 0 (_Str) | highlight_if {{_pre}}_Btn (_case)
+    textShadow {{_pre}}_Btn_text 0 | textBold {{_pre}}_Btn_text false | textColour {{_pre}}_Btn_text #353535
+    autoOnCamera false | createOrigin default
+}
+script_fin
+
+bookmark CBox_SV _name _bool
+    systemvar {{_name}} = _bool
+script_fin
+
+bookmark CBox_GV _name _bool
+    globalvar {{_name}} = _bool
+script_fin
+
+bookmark design
+{
+    //textShadow UI_sys_C_.*(?!Btn).* 0
+    //textColour UI_sys_C_.* #e0e0e0
+    //textBold UI_sys_C_.* false
+    
+    alpha UI_sys_C_.* 255 (tgvCFadeTime)
+    
+    allowRender true
+}
+script_fin
+
+bookmark UI_sys_cd_def
+{
+    autoOnCamera true
+    
+    touchableRes Config/PageBtn_0_Off_{{gvLang}}.webp Config/PageBtn_0_On_{{gvLang}}.webp Config/PageBtn_0_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_cd_Btn_0 0 250 351 script Sys/config-0.txt Setter
+    highlight_if UI_sys_cd_Btn_0 "gvConfigPage == 0"
+    touchableRes Config/PageBtn_1_Off_{{gvLang}}.webp Config/PageBtn_1_On_{{gvLang}}.webp Config/PageBtn_1_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_cd_Btn_1 0 450 351 script Sys/config-1.txt Setter
+    highlight_if UI_sys_cd_Btn_1 "gvConfigPage == 1"
+    touchableRes Config/PageBtn_2_Off_{{gvLang}}.webp Config/PageBtn_2_On_{{gvLang}}.webp Config/PageBtn_2_On_{{gvLang}}.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+    button0 UI_sys_cd_Btn_2 0 650 351 script Sys/config-2.txt Setter
+    highlight_if UI_sys_cd_Btn_2 "gvConfigPage == 2"
+    touchableRes Config/Btn_Off.webp Config/Btn_On.webp Config/Btn_On.webp ( gvSFX["btn"]["touch"] ) ( gvSFX["btn"]["click"] )
+}
+if ( tgvCFrom == 0 ) jump UI_sys_cd_def_skipTBack
+{
+    button0 UI_sys_cd_Btn_TBack 870 980 350 dialog "tBack" script Sys/events.txt TB | cg0 UI_sys_cd_Btn_TBack_Str Config/BtnText_TBack_Off_{{gvLang}}.webp ( 0.5 * ( 360 - lvTextureW("Config/BtnText_TBack_Off_{{gvLang}}.webp") ) ) ( 62 - lvTextureH("Config/BtnText_TBack_Off_{{gvLang}}.webp") ) 1 | parentChild UI_sys_cd_Btn_TBack UI_sys_cd_Btn_TBack_Str | fadein UI_sys_cd_Btn_TBack_Str
+    cg0 UI_sys_cd_Btn_TBack_Leave Config/Square_Off.webp 18 30 1 | cg0 UI_sys_cd_Btn_TBack_Touch Config/Square_On.webp 5 16 2 | parentChild UI_sys_cd_Btn_TBack UI_sys_cd_Btn_TBack_Touch, UI_sys_cd_Btn_TBack_Leave | fadein UI_sys_cd_Btn_TBack_Leave
+    onTouchStart UI_sys_cd_Btn_TBack script current UITouch "TBack" | onTouchExit UI_sys_cd_Btn_TBack script current UILeave "TBack"
+}
+bookmark UI_sys_cd_def_skipTBack
+{
+    button0 UI_sys_cd_Btn_DefReset 1220 980 350 dialog "DefaultValues" script Sys/config.txt DefReset | cg0 UI_sys_cd_Btn_DefReset_Str Config/BtnText_DefReset_Off_{{gvLang}}.webp ( 0.5 * ( 360 - lvTextureW("Config/BtnText_DefReset_Off_{{gvLang}}.webp") ) ) ( 62 - lvTextureH("Config/BtnText_DefReset_Off_{{gvLang}}.webp") ) 1 | parentChild UI_sys_cd_Btn_DefReset UI_sys_cd_Btn_DefReset_Str | fadein UI_sys_cd_Btn_DefReset_Str
+    cg0 UI_sys_cd_Btn_DefReset_Leave Config/Square_Off.webp 18 30 1 | cg0 UI_sys_cd_Btn_DefReset_Touch Config/Square_On.webp 5 16 2 | parentChild UI_sys_cd_Btn_DefReset UI_sys_cd_Btn_DefReset_Touch, UI_sys_cd_Btn_DefReset_Leave | fadein UI_sys_cd_Btn_DefReset_Leave
+    onTouchStart UI_sys_cd_Btn_DefReset script current UITouch "DefReset" | onTouchExit UI_sys_cd_Btn_DefReset script current UILeave "DefReset"
+    touchableRes Config/Btn_Off.webp Config/Btn_On.webp Config/Btn_On.webp ( gvSFX["exit"]["touch"] ) ( gvSFX["exit"]["click"] )
+    button0 UI_sys_cd_Btn_Back 1570 980 350 jump Exit | cg0 UI_sys_cd_Btn_Back_Str Config/BtnText_Back_Off_{{gvLang}}.webp ( 0.5 * ( 360 - lvTextureW("Config/BtnText_Back_Off_{{gvLang}}.webp") ) ) ( 62 - lvTextureH("Config/BtnText_Back_Off_{{gvLang}}.webp") ) 1 | parentChild UI_sys_cd_Btn_Back UI_sys_cd_Btn_Back_Str | fadein UI_sys_cd_Btn_Back_Str
+    cg0 UI_sys_cd_Btn_Back_Leave Config/Square_Off.webp 18 30 1 | cg0 UI_sys_cd_Btn_Back_Touch Config/Square_On.webp 5 16 2 | parentChild UI_sys_cd_Btn_Back UI_sys_cd_Btn_Back_Touch, UI_sys_cd_Btn_Back_Leave | fadein UI_sys_cd_Btn_Back_Leave
+    onTouchStart UI_sys_cd_Btn_Back script current UITouch "Back" | onTouchExit UI_sys_cd_Btn_Back script current UILeave "Back"
+    
+    autoOnCamera false
+}
+script_fin
+
+bookmark UITouch _num
+{
+    if ( tgvSLDiv == _num ) script_fin
+}
+bookmark UITouch_force _num
+{
+    alpha UI_sys_cd_Btn_{{_num}}_Touch 255 | alpha UI_sys_cd_Btn_{{_num}}_Leave 0 | zoom UI_sys_cd_Btn_{{_num}}_Touch 150% 200 a6
+    image UI_sys_cd_Btn_{{_num}}_Str Config/BtnText_{{_num}}_On_{{gvLang}}.webp
+}
+script_fin
+
+bookmark UILeave _num
+{
+    if ( tgvSLDiv == _num ) script_fin
+    alpha UI_sys_cd_Btn_{{_num}}_Leave 255 | alpha UI_sys_cd_Btn_{{_num}}_Touch 0 | zoom UI_sys_cd_Btn_{{_num}}_Touch 100%
+    image UI_sys_cd_Btn_{{_num}}_Str Config/BtnText_{{_num}}_Off_{{gvLang}}.webp
+}
+script_fin
+bookmark Fix0
+{
+    saveSystemVars
+    systemvar vn_sysTextSpeed = ( lvRoundToInteger(vn_sysTextSpeed) )
+    saveSystemVars
+}
+script_fin
+
+bookmark Fix1
+{
+    saveSystemVars
+    systemvar vn_sysAutoSpeed = ( lvRoundToInteger(vn_sysAutoSpeed) )
+    saveSystemVars
+}
+script_fin
+
+bookmark Fix2
+{
+    saveSystemVars
+    systemvar vn_sysAutoWait = ( lvRoundToInteger(vn_sysAutoWait) / 100 * 100 )
+    saveSystemVars
+}
+script_fin
+
+bookmark DefReset
+{
+    
+    globalvar gvWindowW = 1280 | globalvar gvWindowH = 720 | screen 2
+    
+    globalvar gvReadColor = true
+    globalvar gvSelColor = true
+    globalvar gvSysVoice = true
+    globalvar gvCaller = 0
+    globalvar gvCSVColumn = gvLang
+    globalvar gvTBoxAlpha = 255
+    
+    globalvar gvVol_Nagi = 100 | globalvar gvVoiceOn_Nagi = true
+    globalvar gvVol_Yami = 100 | globalvar gvVoiceOn_Yami = true
+    globalvar gvVol_Rinna = 100 | globalvar gvVoiceOn_Rinna = true
+    globalvar gvVol_Shion = 100 | globalvar gvVoiceOn_Shion = true
+    globalvar gvVol_Others = 100 | globalvar gvVoiceOn_Others = true
+    
+    globalvar gvDialog["global"] = true
+
+    script Sys/initial.txt FirstSysVars
+}
+script_fin
+
+bookmark Exit_KT
+{
+    soundEffect vn_clickedSound (gvSFX["exit"]["click"])
+}
+bookmark Exit
+{
+    inputLock true
+    
+    saveSystemVars
+    saveGlobalVars
+    script Sys/textbox.txt AllowNext
+    
+    fadeout vn_.*clickedSound 300
+    fadeout SV 300 allScreenSpaces
+    .fadeout UI_sys_.* 300
+    .fadeout screenspace 300
+    screenSpaceFin config_set
+    script Sys/global.txt Play
+    
+    eraseVars2 tgvC.* | releaseUnusedMemory | inputLock false
+    PopAllow
+}
+script_fin

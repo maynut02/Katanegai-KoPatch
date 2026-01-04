@@ -1,0 +1,83 @@
+
+script Sys/initial.txt Dev
+bg UI_sys_cd_bg Config/BG.webp 0 0 320 on_camera | script Sys/config.txt UI_sys_cd_def | fadein UI_sys_cd_.*
+
+bookmark Setter_KT
+{
+    if ( gvConfigPage == 2 ) script_fin
+    soundEffect vn_clickedSound (gvSFX["btn"]["click"])
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-13.flac
+}
+jump IntSetter
+bookmark Setter
+{
+    if ( gvConfigPage == 2 ) script_fin
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-13.flac
+}
+bookmark IntSetter
+{
+    globalvar gvConfigPage = 2
+    
+    inputLock true | autoOnCamera true | allowRender false
+    
+    .fadeout UI_sys_C_.*
+    var _d = 200
+    
+    script Sys/config.txt Cont0 "Master" 450 (_d) "전체"
+    script Sys/config.txt TBar "Master" 805 (_d) "vn_sysMasterVolume" 0 100
+    script Sys/config.txt Cont3 "Master" 1535 (_d) "vn_sysMasterVolumeOn"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "BGM" 450 (_d) "배경음"
+    script Sys/config.txt TBar "BGM" 805 (_d) "vn_sysBgmVolume" 0 100
+    script Sys/config.txt Cont3 "BGM" 1535 (_d) "vn_sysBgmVolumeOn"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "SFX" 450 (_d) "효과음"
+    script Sys/config.txt TBar "SFX" 805 (_d) "vn_sysSfxVolume" 0 100
+    script Sys/config.txt Cont3 "SFX" 1535 (_d) "vn_sysSfxVolumeOn"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "Voice" 450 (_d) "보이스"
+    script Sys/config.txt TBar "Voice" 805 (_d) "vn_sysVoiceVolume" 0 100
+    script Sys/config.txt Cont3 "Voice" 1535 (_d) "vn_sysVoiceVolumeOn"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "Nagi" 500 (_d) ("개별 - " + gvStr["Nagi"][gvLang])
+    script Sys/config.txt TBar "Nagi" 805 (_d) "gvVol_Nagi" 0 100
+    script Sys/config.txt Cont4 "Nagi" 1535 (_d) "gvVoiceOn_Nagi"
+   
+    var _d += 90
+    script Sys/config.txt Cont0 "Yami" 500 (_d) ("개별 - " + gvStr["Yami"][gvLang])
+    script Sys/config.txt TBar "Yami" 805 (_d) "gvVol_Yami" 0 100
+    script Sys/config.txt Cont4 "Yami" 1535 (_d) "gvVoiceOn_Yami"
+}
+if ( gvConfigHideRinna ) jump SkipRinna
+{
+    var _d += 90
+    script Sys/config.txt Cont0 "Rinna" 500 (_d) ("개별 - " + gvStr["Rinna"][gvLang])
+    script Sys/config.txt TBar "Rinna" 805 (_d) "gvVol_Rinna" 0 100
+    script Sys/config.txt Cont4 "Rinna" 1535 (_d) "gvVoiceOn_Rinna"
+}
+bookmark SkipRinna
+if ( gvConfigHideShion ) jump SkipShion
+{
+    var _d += 90
+    script Sys/config.txt Cont0 "Shion" 500 (_d) ("개별 - " + gvStr["Shion"][gvLang])
+    script Sys/config.txt TBar "Shion" 805 (_d) "gvVol_Shion" 0 100
+    script Sys/config.txt Cont4 "Shion" 1535 (_d) "gvVoiceOn_Shion"
+}
+bookmark SkipShion
+    var _d += 90
+    script Sys/config.txt Cont0 "Others" 500 (_d) ("개별 - " + gvStr["Others"][gvLang])
+    script Sys/config.txt TBar "Others" 805 (_d) "gvVol_Others" 0 100
+    script Sys/config.txt Cont4 "Others" 1535 (_d) "gvVoiceOn_Others"
+    
+    script Sys/config.txt Cont0 "Off" 1522 155 (gvStr["Off"][gvLang]) 25
+    script Sys/config.txt Cont0 "On" 1602 155 (gvStr["On"][gvLang]) 25
+    
+    script Sys/config.txt design
+    
+    inputLock false
+}
+script_fin

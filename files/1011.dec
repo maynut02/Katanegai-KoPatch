@@ -1,0 +1,95 @@
+
+script Sys/list.txt iMacros
+
+bookmark Main
+    icHConst0 "BGM"
+    icHConst1 "0"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "언제까지나"
+    icHConst1 "1"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "평온"
+    icHConst1 "2"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "불안"
+    icHConst1 "3"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "나기"
+    icHConst1 "4" //2.886-1:40.563
+        icInitHSetter1 "bool" true
+        icHSetter1 "loopS" 2886
+        icHSetter1 "loopE" 100563
+        icHConst2 "name"
+            icHSetter2 "jpn" "일섬"
+    icHConst1 "5"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "카타미야 신사"
+    icHConst1 "6" //22.527-1:51.872
+        icInitHSetter1 "bool" true
+        icHSetter1 "loopS" 22527
+        icHSetter1 "loopE" 111872
+        icHConst2 "name"
+            icHSetter2 "jpn" "야미"
+    icHConst1 "7"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "운명"
+    icHConst1 "8"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "고동"
+    icHConst1 "9" //5.665-2:28.298
+        icInitHSetter1 "bool" true
+        icHSetter1 "loopS" 5665
+        icHSetter1 "loopE" 148298
+        icHConst2 "name"
+            icHSetter2 "jpn" "친애"
+    icHConst1 "10"
+        icInitHSetter1 "bool" true
+        icHConst2 "name"
+            icHSetter2 "jpn" "반쌍"
+    icHConst1 "11" //26.542-2:42.491
+        icInitHSetter1 "bool" true
+        icHSetter1 "loopS" 26542
+        icHSetter1 "loopE" 162491
+        icHConst2 "name"
+            icHSetter2 "jpn" "회상"
+    icHConst1 "12" //18.696-1:28.407
+        icInitHSetter1 "bool" false
+        icHSetter1 "loopS" 18696
+        icHSetter1 "loopE" 88407
+        icHConst2 "name"
+            icHSetter2 "jpn" "천양"
+    icHConst1 "13"
+        icInitHSetter1 "bool" false
+        icHConst2 "name"
+            icHSetter2 "jpn" "소원"
+    icHConst1 "14"
+        icInitHSetter1 "bool" false
+        icHConst2 "name"
+            icHSetter2 "jpn" "'소원'"
+    icHConst1 "15"
+        icInitHSetter1 "bool" false
+        icHConst2 "name"
+            icHSetter2 "jpn" "'소원' (Instrumental)"
+    icHConst1 "16"
+        icInitHSetter1 "bool" false
+        icHConst2 "name"
+            icHSetter2 "jpn" "카타네가이"
+    icHConst1 "17"
+        icInitHSetter1 "bool" false
+        icHConst2 "name"
+            icHSetter2 "jpn" "카타네가이 (Instrumental)"
+/*
+    icHConst1 ""
+        icHSetter1 "loopS" 
+        icHSetter1 "loopE" 
+        icHConst2 "name"
+            icHSetter2 "jpn" ""
+*/
+script_fin

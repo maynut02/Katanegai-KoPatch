@@ -1,0 +1,114 @@
+
+script Sys/global.txt Dev
+bg UI_sys_cd_bg Config/BG.webp 0 0 320 on_camera | script Sys/config.txt UI_sys_cd_def | fadein UI_sys_cd_.*
+
+bookmark Setter_KT
+{
+    if ( gvConfigPage == 0 ) script_fin
+    soundEffect vn_clickedSound (gvSFX["btn"]["click"])
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-11.flac
+}
+jump IntSetter
+bookmark Setter
+{
+    if ( gvConfigPage == 0 ) script_fin
+    if ( gvSysVoice ) soundEffect SV SysV/SysV-{{gvCaller}}-11.flac
+}
+bookmark IntSetter
+{
+    globalvar gvConfigPage = 0
+    
+    inputLock true | autoOnCamera true | allowRender false
+    
+    .fadeout UI_sys_C_.*
+    var _d = 200
+}
+if ( vn_system_name != "Windows" ) jump system_SkipWindow
+{
+    script Sys/config.txt Cont0 "WindowSize" 450 (_d) "화면 크기"
+    script Sys/config.txt Cont1 "576" 980 (_d) "1024 × 576" "script Sys/config-0.txt setVars_Window 1024 576" "gvWindowW == 1024"
+    script Sys/config.txt Cont1 "720" 1320 (_d) "1280 × 720" "script Sys/config-0.txt setVars_Window 1280 720" "gvWindowW == 1280"
+    script Sys/config.txt Cont1 "1080" 1660 (_d) "1920 × 1080" "script Sys/config-0.txt setVars_Window 1920 1080" "gvWindowW == 1920"
+    
+    var _d += 90
+    
+    script Sys/config.txt Cont0 "WindowMode" 450 (_d) "화면 모드"
+    script Sys/config.txt Cont1 "Window" 980 (_d) "창 모드" "script Sys/config-0.txt ApplyWindow" "lvSystem::WindowMode() == 1"
+    script Sys/config.txt Cont1 "FullScreen" 1320 (_d) "전체화면" "screen 0" "lvSystem::WindowMode() == 0"
+    script Sys/config.txt Cont1 "FullWindow" 1660 (_d) "테두리 없는 창 모드" "screen 2" "lvSystem::WindowMode() == 2"
+    
+    var _d += 90
+}
+bookmark system_SkipWindow
+{
+    script Sys/config.txt Cont0 "Cursor" 450 (_d) "커서 숨김"
+    script Sys/config.txt Cont1 "Cursor1000" 980 (_d) "1초" "script Sys/config-0.txt Cursor 1000" "gvCursorHide == \"1000\""
+    script Sys/config.txt Cont1 "Cursor2000" 1320 (_d) "2초" "script Sys/config-0.txt Cursor 2000" "gvCursorHide == \"2000\""
+    script Sys/config.txt Cont1 "CursorOn" 1660 (_d) "항상 표시" "script Sys/config-0.txt Cursor false" "gvCursorHide == \"false\""
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "Dialog" 450 (_d) "다이얼로그 확인"
+    script Sys/config.txt Cont1 "DialogOn" 980 (_d) (gvStr["enable"][gvLang]) "script Sys/config-0.txt Dialog true" "gvDialog[\"global\"] == true"
+    script Sys/config.txt Cont1 "DialogOff" 1320 (_d) (gvStr["disable"][gvLang]) "script Sys/config-0.txt Dialog false" "gvDialog[\"global\"] == false"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "Cut" 450 (_d) "보이스 중단"
+    script Sys/config.txt Cont1 "CutOn" 980 (_d) ( gvStr["yes"][gvLang] ) "voicePlayType 0" "vn_sysVoicePlayType == 0"
+    script Sys/config.txt Cont1 "CutOff" 1320 (_d) ( gvStr["no"][gvLang] ) "voicePlayType 2" "vn_sysVoicePlayType == 2"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "SysVoice" 450 (_d) "시스템 보이스"
+    script Sys/config.txt Cont1 "SVOn" 980 (_d) (gvStr["enable"][gvLang]) "script Sys/config-0.txt SysVoice true" "gvSysVoice == true"
+    script Sys/config.txt Cont1 "SVOff" 1320 (_d) (gvStr["disable"][gvLang]) "script Sys/config-0.txt SysVoice false" "gvSysVoice == false"
+    
+    var _d += 90
+    script Sys/config.txt Cont0 "Caller" 450 (_d) "(캐릭터)"
+    script Sys/config.txt Cont5 "Nagi" 990 ( _d + 15 ) "나기" "script Sys/config-0.txt SysVoiceSpeaker 0" "gvCaller == 0"
+    script Sys/config.txt Cont5 "Yami" 1330 ( _d + 15 ) "야미" "script Sys/config-0.txt SysVoiceSpeaker 1" "gvCaller == 1"
+    if ( gvCompleteRinne ) script Sys/config.txt Cont5 "Rinna" 1650 ( _d + 15 ) "린나" "script Sys/config-0.txt SysVoiceSpeaker 2" "gvCaller == 2"
+    
+    script Sys/config.txt design
+    
+    inputLock false
+}
+script_fin
+
+bookmark ApplyWindow
+{
+    if ( lvSystem::WindowMode() == 1 ) script_fin
+    screen 1 (gvWindowW) (gvWindowH)
+}
+script_fin
+
+bookmark setVars_Window _W _H
+{
+    globalvar gvWindowW = (_W) | globalvar gvWindowH = (_H)
+    saveGlobalVars
+    
+    if ( lvSystem::WindowMode() == 1 ) screen 1 (_W) (_H)
+}
+script_fin
+
+bookmark Dialog _value
+{
+    globalvar gvDialog["global"] = _value | saveGlobalVars
+}
+script_fin
+
+bookmark Cursor _value
+    globalvar gvCursorHide = "{{_value}}" | saveGlobalVars
+script_fin
+
+bookmark SysVoice _bool
+{
+    globalvar gvSysVoice = _bool | saveGlobalVars
+}
+script_fin
+
+bookmark SysVoiceSpeaker _num
+{
+    if ( _num == gvCaller ) script_fin
+    globalvar gvCaller = _num | saveGlobalVars
+    soundEffect SV SysV/SysV-{{_num}}-14.flac
+}
+script_fin
