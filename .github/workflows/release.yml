@@ -20,12 +20,12 @@ jobs:
 
       - name: Archive _ folder
         run: |
-          mkdir -p "카타네가이_한글패치_${{ github.ref_name }}/Data"
-          cp -r _ "카타네가이_한글패치_${{ github.ref_name }}/Data/"
-          zip -r "카타네가이_한글패치_${{ github.ref_name }}.zip" "카타네가이_한글패치_${{ github.ref_name }}"
+          mkdir -p Data
+          cp -r _ Data/
+          zip -r "Katanegai-KoPatch_${{ github.ref_name }}.zip" Data
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: "카타네가이_한글패치_${{ github.ref_name }}.zip"
+          files: "Katanegai-KoPatch_${{ github.ref_name }}.zip"
           generate_release_notes: true
