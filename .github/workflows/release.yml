@@ -1,0 +1,31 @@
+name: Release _ Folder
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Archive _ folder
+        run: |
+          mkdir -p "카타네가이_한글패치_${{ github.ref_name }}/Data"
+          cp -r _ "카타네가이_한글패치_${{ github.ref_name }}/Data/"
+          zip -r "카타네가이_한글패치_${{ github.ref_name }}.zip" "카타네가이_한글패치_${{ github.ref_name }}"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "카타네가이_한글패치_${{ github.ref_name }}.zip"
+          generate_release_notes: true
